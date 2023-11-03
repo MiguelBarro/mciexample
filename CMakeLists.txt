@@ -10,4 +10,6 @@ target_link_libraries(mci Winmm.lib)
 
 target_compile_features(mci PUBLIC cxx_std_17)
 
+target_compile_options(mci PUBLIC /utf-8)
+
 install(TARGETS mci DESTINATION ${CMAKE_CURRENT_LIST_DIR}/install)

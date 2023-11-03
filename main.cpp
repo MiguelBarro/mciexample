@@ -5,12 +5,17 @@
 
 #include "mciAssert.hpp"
 
+#include <fcntl.h>
+#include <io.h>
+#include <ConsoleApi2.h>
+
 using namespace std::chrono_literals;
 
 // https://learn.microsoft.com/en-us/windows/win32/multimedia/device-types
 void playing_mp3();
 void playing_wav();
 void playing_vim_wav();
+void playing_vim_wav_unicode();
 
 int main()
 {
@@ -18,7 +23,8 @@ int main()
     {
 //      playing_mp3();
 //      playing_wav();
-        playing_vim_wav();
+//      playing_vim_wav();
+        playing_vim_wav_unicode();
     }
     catch (std::basic_string<TCHAR> e)
     {
@@ -73,6 +79,30 @@ void playing_mp3()
     LPTSTR close_command = TEXT("close laser");
     tout << close_command << std::endl;
     mciAssert(mciSendString(close_command, nullptr, 0, nullptr));
+}
+
+void playing_vim_wav_unicode()
+{
+    _setmode(_fileno(stdout), _O_WTEXT);
+    SetConsoleOutputCP(65001);
+
+    // open a media file
+    LPWSTR open_command = LR"(open "C:\Users\migue\AppData\Local\Temp\мир.wav" alias sound1)";
+//  LPWSTR open_command = L"open \"C:\\Users\\migue\\AppData\\Local\\Temp\\мир.wav\" alias sound1";
+//  LPWSTR open_command = L"open \"C:\\Users\\migue\\AppData\\Local\\Temp\\\u043c\u0438\u0440.wav\" alias sound1";
+    std::wcout << open_command << std::endl;
+    mciAssert(mciSendStringW(open_command, nullptr, 0, nullptr));
+
+    // play media file
+    LPWSTR play_command = L"play sound1 wait"; // wait till end
+    std::wcout << play_command << std::endl;
+    mciAssert(mciSendStringW(play_command, nullptr, 0, nullptr));
+
+    // close media file
+    LPWSTR close_command = L"close sound1";
+    std::wcout << close_command << std::endl;
+    mciAssert(mciSendStringW(close_command, nullptr, 0, nullptr));
+
 }
 
 void playing_vim_wav()
